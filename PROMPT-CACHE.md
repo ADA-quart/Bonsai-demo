@@ -60,7 +60,7 @@ guarantee identical output across those shapes: a small logit change can select 
 different token and alter the continuation. The reporter's matching long-prompt
 outputs are useful evidence for those requests, not a guarantee for every length.
 
-For short independent requests, compare this explicitly with checkpoints enabled:
+For short independent requests, compare against a server with checkpoints disabled:
 
 ```bash
 ./scripts/start_llama_server.sh --parallel 1 --ctx-checkpoints 0
