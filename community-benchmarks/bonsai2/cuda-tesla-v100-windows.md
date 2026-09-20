@@ -22,8 +22,9 @@ bands), not the previous Ternary-Bonsai family. PrismML fork commit `9a9394a89` 
 ### Ternary Bonsai 2 27B — PQ2_0 (locally built sm_70 SASS)
 
 ```bash
+# locally built sm_70 SASS binary
 BENCH=bin/cuda/llama-bench
-$BENCH -m models/bonsai2-gguf/27B/Ternary-Bonsai-2-27B-PQ2_0.gguf -ngl 99 -fa 1
+$BENCH -m models/bonsai2-gguf/27B/Ternary-Bonsai-2-27B-PQ2_0.gguf -ngl 99 -fa 1 -p 512 -n 128 -r 3
 ```
 
 ggml_cuda_init: found 1 CUDA devices (Total VRAM: 16383 MiB):
@@ -41,7 +42,7 @@ build: unknown (0)
 
 ```bash
 BENCH=bin/cuda-prebuilt/llama-bench
-$BENCH -m models/bonsai2-gguf/27B/Ternary-Bonsai-2-27B-PQ2_0.gguf -ngl 99 -fa 1
+$BENCH -m models/bonsai2-gguf/27B/Ternary-Bonsai-2-27B-PQ2_0.gguf -ngl 99 -fa 1 -p 512 -n 128 -r 3
 ```
 
 ggml_cuda_init: found 1 CUDA devices (Total VRAM: 16383 MiB):
@@ -58,7 +59,9 @@ build: 9a9394a89 (10709)
 ### Ternary Bonsai 2 27B — PTQ1_0 (locally built sm_70 SASS)
 
 ```bash
-$BENCH -m models/bonsai2-gguf/27B/Ternary-Bonsai-2-27B-PTQ1_0.gguf -ngl 99 -fa 1
+# back to the locally built sm_70 SASS binary (do not reuse the prebuilt $BENCH from the previous section)
+BENCH=bin/cuda/llama-bench
+$BENCH -m models/bonsai2-gguf/27B/Ternary-Bonsai-2-27B-PTQ1_0.gguf -ngl 99 -fa 1 -p 512 -n 128 -r 3
 ```
 
 ggml_cuda_init: found 1 CUDA devices (Total VRAM: 16383 MiB):

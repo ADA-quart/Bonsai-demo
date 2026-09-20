@@ -42,10 +42,23 @@ Sorted by decode speed (TG128). The 27B models come in two families: Bonsai (1-b
 | Bonsai (1-bit) | NVIDIA RTX A2000 Laptop (4 GB) | llama.cpp CUDA | 1,387 | 63 | [link](bonsai/cuda-rtxa2000-debian.md) |
 | Ternary | Apple M3 Pro 18 GB | llama.cpp Metal | 288 | 51.3 | [link](ternary-bonsai/metal-m3-pro-macos.md) |
 
+## Bonsai 2
+
+Community results for **Bonsai 2** (the ternary hybrid-attention 27B,
+[`prism-ml/Ternary-Bonsai-2-27B-gguf`](https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf)).
+Bonsai 2 is a new generation rather than a new packing of the family above: its weights live in a
+rotated basis, its bands are `PQ2_0` (2.13 bpw, 6.70 GiB) and `PTQ1_0` (1.75 bpw, 5.53 GiB), and it
+needs the fork binaries. Full results and submission notes: [bonsai2/README.md](bonsai2/README.md).
+
+| Hardware | Backend | Band | PP512 (t/s) | TG128 (t/s) | DSpark TG (t/s) | Details |
+|----------|---------|------|------------:|------------:|----------------:|---------|
+| NVIDIA Tesla V100-SXM2 16 GB | llama.cpp CUDA (Windows) | `PQ2_0` | 798 | 46.0 | | [link](bonsai2/cuda-tesla-v100-windows.md) |
+
 ## Model Families
 
 - **[Bonsai (1-bit)](bonsai/)**: the 1-bit Bonsai family (27B, 8B, 4B, 1.7B) in GGUF and MLX 1-bit formats.
 - **[Ternary-Bonsai](ternary-bonsai/)**: the ternary Bonsai family (27B, 8B, 4B, 1.7B) in GGUF (`PQ2_0` and `Q2_0` group-64) and MLX (2-bit) formats.
+- **[Bonsai 2](bonsai2/)**: the ternary Bonsai 2 family (27B) in GGUF (`PQ2_0` and `PTQ1_0`); a separate generation that needs the fork's rotated-basis kernels.
 
 Each subfolder has its own README with results, submission templates, and filename conventions.
 
@@ -55,4 +68,5 @@ Each subfolder has its own README with results, submission templates, and filena
 2. Go into the subfolder for your model family and follow its `README.md`:
    - [bonsai/README.md](bonsai/README.md)
    - [ternary-bonsai/README.md](ternary-bonsai/README.md)
+   - [bonsai2/README.md](bonsai2/README.md)
 3. Open a PR to this repo with your filled-in file placed inside the appropriate subfolder.
