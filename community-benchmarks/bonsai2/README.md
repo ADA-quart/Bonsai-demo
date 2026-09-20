@@ -30,13 +30,24 @@ binary comparison, and q4_0 KV-cache long-context results.
 | `PQ2_0` | 2.13 | 6.70 GiB | group-128 packing; usually the fastest decode on H100/A100/Blackwell, faster prompt processing everywhere |
 | `PTQ1_0` | 1.75 | 5.53 GiB | smaller; usually the faster decode on Ada-generation cards and the L4 |
 
-Both bands need the fork's kernels; `setup.ps1` / `setup.sh` downloads `PQ2_0` by default.
+Both bands need the fork's kernels. `setup.ps1` / `setup.sh` downloads `PQ2_0` by default; grab the
+smaller band as well if you have the disk:
+
+```bash
+hf download prism-ml/Ternary-Bonsai-2-27B-gguf --include "*PTQ1_0*" --local-dir models/bonsai2-gguf/27B
+```
 
 ## How to Submit
 
-1. Run `./setup.ps1` (Windows) or `./setup.sh` to download Bonsai 2 27B and the binaries.
-2. Copy [TERNARY-TEMPLATE-llama-cpp.md](../ternary-bonsai/TERNARY-TEMPLATE-llama-cpp.md) (the llama.cpp
-   template still applies) to a new file here, named `<backend>-<hardware>-<os>.md`
-   (lowercase, dashes for spaces), e.g. `cuda-tesla-v100-windows.md`.
-3. Include both bands where disk allows, and paste the raw `llama-bench` output as-is.
+There is no Bonsai 2 template yet (the [ternary-bonsai template](../ternary-bonsai/TERNARY-TEMPLATE-llama-cpp.md)
+still describes the previous generation's files, so do not copy its download commands). Use the report
+in this folder as the structure to follow:
+
+1. Run `./setup.ps1` (Windows) or `./setup.sh` to download Bonsai 2 27B and the binaries; add the other
+   band with the `hf download` line above.
+2. Run `llama-bench` from the binaries the demo installed, e.g.
+   `bin/cuda/llama-bench -m models/bonsai2-gguf/27B/Ternary-Bonsai-2-27B-PQ2_0.gguf -ngl 99 -fa 1 -p 512 -n 128 -r 3`.
+3. Save the report here as `<backend>-<hardware>-<os>.md` (lowercase, dashes for spaces), paste the raw
+   `llama-bench` output as-is, and note the KV-cache type and anything that affects the numbers
+   (desktop VRAM in use, power limits, thermals).
 4. Open a PR against this repo.
