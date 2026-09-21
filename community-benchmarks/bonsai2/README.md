@@ -19,9 +19,11 @@ default f16 KV cache unless noted.
 | Hardware | Backend | Band | PP512 (t/s) | TG128 (t/s) | DSpark TG (t/s) | Details |
 |----------|---------|------|------------:|------------:|----------------:|---------|
 | NVIDIA Tesla V100-SXM2 16 GB | llama.cpp CUDA (Windows) | `PQ2_0` | 798 | 46.0 | | [link](cuda-tesla-v100-windows.md) |
+| NVIDIA Tesla V100-SXM2 16 GB | llama.cpp CUDA (Windows) | `PTQ1_0` | 852 | 34.3 | | [link](cuda-tesla-v100-windows.md) |
 
-The V100 report also contains `PTQ1_0` numbers (852 t/s pp512 / 34.3 t/s tg128), a prebuilt-vs-native
-binary comparison, and q4_0 KV-cache long-context results.
+The V100 report also contains a prebuilt-vs-native binary comparison and q4_0 KV-cache long-context
+results. On that card `PTQ1_0` wins prompt processing (852 vs 798 t/s) while `PQ2_0` wins decode
+(46.0 vs 34.3 t/s).
 
 ## Formats
 
@@ -30,8 +32,8 @@ binary comparison, and q4_0 KV-cache long-context results.
 | `PQ2_0` | 2.13 | 6.70 GiB | group-128 packing; usually the fastest decode on H100/A100/Blackwell, faster prompt processing everywhere |
 | `PTQ1_0` | 1.75 | 5.53 GiB | smaller; usually the faster decode on Ada-generation cards and the L4 |
 
-Both bands need the fork's kernels. `setup.ps1` / `setup.sh` downloads `PQ2_0` by default; grab the
-smaller band as well if you have the disk:
+Both bands need the fork's kernels. The setup scripts download `PQ2_0`; grab the smaller band as well
+if you have the disk:
 
 ```bash
 hf download prism-ml/Ternary-Bonsai-2-27B-gguf --include "*PTQ1_0*" --local-dir models/bonsai2-gguf/27B
@@ -43,8 +45,10 @@ There is no Bonsai 2 template yet (the [ternary-bonsai template](../ternary-bons
 still describes the previous generation's files, so do not copy its download commands). Use the report
 in this folder as the structure to follow:
 
-1. Run `./setup.ps1` (Windows) or `./setup.sh` to download Bonsai 2 27B and the binaries; add the other
-   band with the `hf download` line above.
+1. Download Bonsai 2 27B and the binaries: `.\setup.ps1` on Windows (it already defaults to Bonsai 2),
+   or `BONSAI_FAMILY=bonsai2 ./setup.sh` on Linux/macOS — `setup.sh` defaults to `BONSAI_FAMILY=ternary`,
+   i.e. the previous generation, so the variable is required. Add the other band with the
+   `hf download` line above.
 2. Run `llama-bench` from the binaries the demo installed, e.g.
    `bin/cuda/llama-bench -m models/bonsai2-gguf/27B/Ternary-Bonsai-2-27B-PQ2_0.gguf -ngl 99 -fa 1 -p 512 -n 128 -r 3`.
 3. Save the report here as `<backend>-<hardware>-<os>.md` (lowercase, dashes for spaces), paste the raw

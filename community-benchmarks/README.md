@@ -4,7 +4,7 @@ Benchmark results submitted by the community, organized by model. **We are espec
 
 ## Bonsai-27B
 
-Sorted by decode speed (TG128). The 27B models come in two families: Bonsai (1-bit, `Q1_0`) and Ternary-Bonsai (2-bit). Since the fork's rebase onto current mainline llama.cpp (releases `prism-b10658` and newer), the ternary GGUFs come in **two formats**: `PQ2_0` (our group-128 packing, smallest and usually fastest where supported) and `Q2_0` (the official upstream group-64 format, widest backend coverage). Ternary submissions on new builds should include **both** where possible; the table's ternary numbers use `PQ2_0` unless noted. Optional column: decode speed with the paired DSpark drafter, where the submitter measured it (llama-server via `BONSAI_SPECULATIVE=1 ./scripts/start_llama_server.sh`; on MLX via community harnesses such as dspark-mlx). Plain `llama-bench` does not exercise the drafter. DSpark numbers measured via `llama-server` with the chat template read lower than single-prompt bare-loop tools (`llama-speculative-simple`) on the same hardware — server per-token overhead plus a harder-to-draft token distribution — so compare like with like; the entry files state which harness was used.
+Sorted by decode speed (TG128). The 27B models come in three families: Bonsai (1-bit, `Q1_0`), Ternary-Bonsai (2-bit) and **Bonsai 2** (the rotated-basis generation, [`prism-ml/Ternary-Bonsai-2-27B-gguf`](https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf), whose results live in [bonsai2/](bonsai2/)). Since the fork's rebase onto current mainline llama.cpp (releases `prism-b10658` and newer), the **previous-generation** ternary GGUFs come in **two formats**: `PQ2_0` (our group-128 packing, smallest and usually fastest where supported) and `Q2_0` (the official upstream group-64 format, widest backend coverage). Bonsai 2 has no group-64 fallback: it ships its own `PQ2_0` and `PTQ1_0` bands and needs the fork's rotated-basis kernels. Ternary submissions on new builds should include **both** where possible; the table's ternary numbers use `PQ2_0` unless noted. Optional column: decode speed with the paired DSpark drafter, where the submitter measured it (llama-server via `BONSAI_SPECULATIVE=1 ./scripts/start_llama_server.sh`; on MLX via community harnesses such as dspark-mlx). Plain `llama-bench` does not exercise the drafter. DSpark numbers measured via `llama-server` with the chat template read lower than single-prompt bare-loop tools (`llama-speculative-simple`) on the same hardware — server per-token overhead plus a harder-to-draft token distribution — so compare like with like; the entry files state which harness was used.
 
 | Family | Hardware | Backend | PP512 (t/s) | TG128 (t/s) | DSpark TG (t/s) | Details |
 |--------|----------|---------|------------:|------------:|----------------:|---------|
@@ -64,7 +64,7 @@ Each subfolder has its own README with results, submission templates, and filena
 
 ## How to Submit
 
-1. Run `./setup.sh` to download models and binaries (`BONSAI_FAMILY=bonsai` for the 1-bit family; the default is ternary)
+1. Download the models and binaries you want to benchmark. On Windows run `.\setup.ps1` (defaults to Bonsai 2); on Linux/macOS run `./setup.sh` with `BONSAI_FAMILY` set to `bonsai` (1-bit family), `ternary` (the default, previous generation) or `bonsai2` (Bonsai 2).
 2. Go into the subfolder for your model family and follow its `README.md`:
    - [bonsai/README.md](bonsai/README.md)
    - [ternary-bonsai/README.md](ternary-bonsai/README.md)
