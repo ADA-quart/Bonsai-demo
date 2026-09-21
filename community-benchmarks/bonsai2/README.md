@@ -1,57 +1,43 @@
 # Bonsai 2 Community Benchmarks
 
-Benchmark results submitted by the community for **Bonsai 2** (the ternary hybrid-attention 27B
-release, [`prism-ml/Ternary-Bonsai-2-27B-gguf`](https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf)).
-
-Bonsai 2 is its own generation, not a new packing of the previous Ternary-Bonsai family: the weights
-live in a rotated basis, so the two generations are not interchangeable and the numbers here are
-**not** directly comparable with the [ternary-bonsai](../ternary-bonsai/) table. Bonsai 2 needs the
-binaries from this demo / the [PrismML fork](https://github.com/PrismML-Eng/llama.cpp); stock llama.cpp
-refuses the files (see [MODEL-FORMATS.md](../../MODEL-FORMATS.md)).
+Benchmark results submitted by the community running
+[Bonsai 2 27B](https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf) on their own hardware.
 
 ## Results
 
-### Bonsai 2 27B
+### Bonsai-2-27B
 
-Sorted by decode speed (TG128). Both bands are measured with `-ngl 99 -fa 1 -p 512 -n 128 -r 3`,
-default f16 KV cache unless noted.
-
-| Hardware | Backend | Band | PP512 (t/s) | TG128 (t/s) | DSpark TG (t/s) | Details |
-|----------|---------|------|------------:|------------:|----------------:|---------|
-| NVIDIA Tesla V100-SXM2 16 GB | llama.cpp CUDA (Windows) | `PQ2_0` | 798 | 46.0 | | [link](cuda-tesla-v100-windows.md) |
-| NVIDIA Tesla V100-SXM2 16 GB | llama.cpp CUDA (Windows) | `PTQ1_0` | 852 | 34.3 | | [link](cuda-tesla-v100-windows.md) |
-
-The V100 report also contains a prebuilt-vs-native binary comparison and q4_0 KV-cache long-context
-results. On that card `PTQ1_0` wins prompt processing (852 vs 798 t/s) while `PQ2_0` wins decode
-(46.0 vs 34.3 t/s).
-
-## Formats
-
-| band | bits/weight | size (27B) | notes |
-|------|------------:|-----------:|-------|
-| `PQ2_0` | 2.13 | 6.70 GiB | group-128 packing; usually the fastest decode on H100/A100/Blackwell, faster prompt processing everywhere |
-| `PTQ1_0` | 1.75 | 5.53 GiB | smaller; usually the faster decode on Ada-generation cards and the L4 |
-
-Both bands need the fork's kernels. The setup scripts download `PQ2_0`; grab the smaller band as well
-if you have the disk:
-
-```bash
-hf download prism-ml/Ternary-Bonsai-2-27B-gguf --include "*PTQ1_0*" --local-dir models/bonsai2-gguf/27B
-```
+| Band | Hardware | Backend | PP512 (t/s) | TG128 (t/s) | Details |
+|------|----------|---------|------------:|------------:|---------|
+| `PTQ1_0` | NVIDIA RTX 4090 24 GB | llama.cpp CUDA (Windows) | 1,597 | 86.0 | [link](cuda-rtx4090-windows.md) |
+| `PQ2_0` | NVIDIA RTX 4090 24 GB | llama.cpp CUDA (Windows) | 3,285 | 84.9 | [link](cuda-rtx4090-windows.md) |
+| `PQ2_0` (community MTP file, plain inference) | NVIDIA RTX 5070 Ti Laptop 12 GB | llama.cpp CUDA (Windows) | 1,135 | 49.0 | [link](cuda-rtx5070ti-laptop-windows.md) |
+| `PTQ1_0` | NVIDIA RTX 5070 Ti Laptop 12 GB | llama.cpp CUDA (Windows) | 527 | 49.0 | [link](cuda-rtx5070ti-laptop-windows.md) |
+| `PQ2_0` | NVIDIA Tesla V100-SXM2 16 GB | llama.cpp CUDA (Windows) | 798 | 46.0 | [link](cuda-tesla-v100-windows.md) |
+| `PTQ1_0` | NVIDIA Tesla V100-SXM2 16 GB | llama.cpp CUDA (Windows) | 852 | 34.3 | [link](cuda-tesla-v100-windows.md) |
 
 ## How to Submit
 
-There is no Bonsai 2 template yet (the [ternary-bonsai template](../ternary-bonsai/TERNARY-TEMPLATE-llama-cpp.md)
-still describes the previous generation's files, so do not copy its download commands). Use the report
-in this folder as the structure to follow:
+1. Run `./setup.sh` on macOS/Linux or `.\setup.ps1` in Windows PowerShell.
+   The default family is Bonsai 2; setup downloads `PQ2_0` and the required fork binaries.
+   For `PTQ1_0`, download it from the model repository above and pass its path to
+   `llama-bench -m` (`BONSAI_MODEL` selects a size, not a file path).
+   The development [Q2_0 file](https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf-dev/blob/main/Ternary-Bonsai-2-27B-Q2_0-prism-fork-required.gguf) is also welcome for benchmarking via `-m`.
+   It uses the official llama.cpp `Q2_0` format but **currently requires our fork**
+   for Bonsai 2's Hadamard transform support. Upstream support is pending our PRs.
+2. Copy [TEMPLATE-llama-cpp.md](TEMPLATE-llama-cpp.md) to
+   `<backend>-<hardware>-<os>.md` here (lowercase, dashes). Keep tested formats in
+   the same machine report, with separate commands and raw results for each.
+3. Include the exact model filename, binary release or commit, hardware, OS,
+   driver/backend version, and benchmark command. `PQ2_0`, `PTQ1_0`, and development `Q2_0` results are welcome;
+   one is enough if that is what you tested. Note any skipped or unsupported runs.
+4. Add a row per tested packing to the table above and the
+   [Bonsai 2 table in the main index](../README.md#bonsai-2-27b), then open a PR.
 
-1. Download Bonsai 2 27B and the binaries: `.\setup.ps1` on Windows (it already defaults to Bonsai 2),
-   or `BONSAI_FAMILY=bonsai2 ./setup.sh` on Linux/macOS — `setup.sh` defaults to `BONSAI_FAMILY=ternary`,
-   i.e. the previous generation, so the variable is required. Add the other band with the
-   `hf download` line above.
-2. Run `llama-bench` from the binaries the demo installed, e.g.
-   `bin/cuda/llama-bench -m models/bonsai2-gguf/27B/Ternary-Bonsai-2-27B-PQ2_0.gguf -ngl 99 -fa 1 -p 512 -n 128 -r 3`.
-3. Save the report here as `<backend>-<hardware>-<os>.md` (lowercase, dashes for spaces), paste the raw
-   `llama-bench` output as-is, and note the KV-cache type and anything that affects the numbers
-   (desktop VRAM in use, power limits, thermals).
-4. Open a PR against this repo.
+Use pp512/tg128 for the summary tables. Preserve raw output (including variation)
+in the report. Keep different builds or settings labeled separately.
+
+MLX submissions are also welcome in this folder. Identify the model, runtime versions,
+harness, and prompt/generation lengths. Only put matching pp512/tg128 measurements
+in those columns. Keep server, long-context, speculative decoding, and vision or
+quality checks in separate labeled sections, with their commands and workloads.
