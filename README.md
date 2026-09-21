@@ -58,6 +58,9 @@ The earlier Bonsai families are still here, in smaller sizes too. See [Models](#
 
 ## Quick Start
 
+For repeated conversations and prompt-cache troubleshooting, see
+[Prompt reuse and context checkpoints](PROMPT-CACHE.md).
+
 Setting things up with an AI coding agent? Point it at [AGENTS.md](AGENTS.md), a guide written for agents (hardware-specific knobs, defaults, and what to ask the user).
 
 ### macOS / Linux
